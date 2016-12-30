@@ -1,16 +1,16 @@
 " Vim global plugin for correcting typing mistakes
-" Last Change:	2016 December 24
+" Last Change:	2015 December 24
 " Maintainer:   Noriaki Oshita <noriaki_oshita@whispon.com>
 
 if exists('g:loaded_sentiment_vim')
   finish
 endif
 
-let g:loaded_sentiment_vim = 1
+let g:loaded_sentiment_vim = 0
 let s:save_cpo = &cpo
 set cpo&vim
 
-"Get an access token. Specify the location of the access_token file.
+"Get an accdess token. Specify the location of the access_token file.
 "Get the information. https://cloud.google.com/natural-language/docs/getting-started
 let s:configfile = join(readfile('/Users/noriakioshita/.config/nvim/plugin/.sentiment.vim'))
 
@@ -25,13 +25,25 @@ endfunction
 
 function! s:Sentiment()
   call s:initialize()
-  let json = join(readfile("./message.json"))
+  "let json = join(readfile("./message.json"))
   let url = 'https://language.googleapis.com/v1/documents:analyzeSentiment'
-  let res = webapi#http#post(url, json, {'Authorization': 'Bearer ' . s:settings,'Content-Type': 'application/json'})
-  echo res
+  let res = webapi#http#post(url, '{"document": {"type": "PLAIN_TEXT","language": "JA","content":"' . s:message . '"},"encodingType": "UTF8"}', {'Authorization': 'Bearer ' . s:settings,'Content-Type': 'application/json'})
+  "Save the output to a file.
+  let outputfile = '/Users/noriakioshita/.config/nvim/plugin/output.json'
+  execute "redir! > " . outputfile
+  silent! echon res
+  redir END
+endfunction
+
+function! GetLineText()
+  let s:message = getline('.')
+  call s:Sentiment()
 endfunction
 
 command! Hapinaser :call s:Sentiment()
+command! Getline :call g:GetLineText()
+
+nnoremap <C-g> :Getline<CR>
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
