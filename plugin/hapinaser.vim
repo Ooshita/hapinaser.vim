@@ -1,5 +1,4 @@
-" Vim global plugin for correcting typing mistakes
-" Last Change:	2015 December 24
+" Last Change:	2016 December 31
 " Maintainer:   Noriaki Oshita <noriaki_oshita@whispon.com>
 
 if exists('g:loaded_sentiment_vim')
