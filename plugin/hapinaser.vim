@@ -28,16 +28,29 @@ function! s:Sentiment()
   "let json = join(readfile("./message.json"))
   let url = 'https://language.googleapis.com/v1/documents:analyzeSentiment'
   let res = webapi#http#post(url, '{"document": {"type": "PLAIN_TEXT","language": "JA","content":"' . s:message . '"},"encodingType": "UTF8"}', {'Authorization': 'Bearer ' . s:settings,'Content-Type': 'application/json'})
-  "Save the output to a file.
   let outputfile = '/Users/noriakioshita/.config/nvim/plugin/output.json'
   execute "redir! > " . outputfile
   silent! echon res
   redir END
+  silent! e /Users/noriakioshita/.config/nvim/plugin/output.json
+  let match_line = search("documentSentiment",'b',line("w20"))
+
+  let s:gyo1 = getline(match_line)
+  let s:gyo2 = getline(match_line + 1)
+  let s:gyo3 = getline(match_line + 2)
+  silent! bp
+  if match_line != 0
+    echo s:gyo1.s:gyo2.s:gyo3 
+  endif
 endfunction
 
 function! GetLineText()
   let s:message = getline('.')
   call s:Sentiment()
+  "Initialize variables to analyze sentences continuously
+  unlet s:gyo1
+  unlet s:gyo2
+  unlet s:gyo3
 endfunction
 
 command! Hapinaser :call s:Sentiment()
